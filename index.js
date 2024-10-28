@@ -11,7 +11,6 @@ console.log(port);
 app.use(
   cors({
     origin: [
-      "http://localhost:5000",
       "https://coffee-rush-15b08.web.app",
       "https://coffee-rush-15b08.firebaseapp.com",
     ],
