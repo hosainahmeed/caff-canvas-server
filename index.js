@@ -153,20 +153,17 @@ async function run() {
         console.error(error);
       }
     });
-    app.get("/carts/:email", async (req, res) => {
+    app.get("/carts/:userId", async (req, res) => {
       try {
-        const email = req.params.email;
-        const result = await cartsCoffeeCollection.find({ userEmail: email }).toArray();
-        if (result.length > 0) {
-          res.send(result);
-        } else {
-          res.status(404).send({ message: "No carts found for this email." });
-        }
+        const userId =req.params.userId
+        const result = await cartsCoffeeCollection.find({userId}).toArray();
+        res.send(result);
       } catch (error) {
         console.error(error);
         res.status(500).send({ error: "An error occurred while retrieving carts." });
       }
     });
+    
     
     app.post("/carts", async (req, res) => {
       try {
