@@ -11,7 +11,8 @@ console.log(port);
 app.use(
   cors({
     origin: [
-      "https://coffee-rush-15b08.web.app"
+      "https://coffee-rush-15b08.web.app",
+      "https://coffee-rush-15b08.firebaseapp.com",
     ],
     credentials: true,
   })
@@ -48,7 +49,6 @@ const verifyToken = (req, res, next) => {
     res.status(500).send({ message: "Token verification failed", error });
   }
 };
-
 
 async function run() {
   try {
@@ -160,13 +160,15 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.error(error);
-        res.status(500).send({ error: 'An error occurred while retrieving carts.' });
+        res
+          .status(500)
+          .send({ error: "An error occurred while retrieving carts." });
       }
     });
     app.post("/carts", async (req, res) => {
       try {
         const data = req.body;
-        
+
         const result = await cartsCoffeeCollection.insertOne(data);
         res.send(result);
       } catch (error) {
