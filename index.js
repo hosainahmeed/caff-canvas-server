@@ -27,26 +27,26 @@ const client = new MongoClient(uri, {
   },
 });
 
-const jwtVerify = async (req, res, next) => {
+const verifyToken = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-
+    const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: "No token provided" });
     }
 
-    jwt.verify(token, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+    jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, (err, decoded) => {
       if (err) {
-        return res.status(403).send({ message: "Invalid token", err });
+        return res.status(403).send({ message: "Invalid token" });
       }
 
       req.user = decoded;
       next();
     });
   } catch (error) {
-    res.status(500).send({ message: "Server error", error });
+    res.status(500).send({ message: "Token verification failed", error });
   }
 };
+
 
 async function run() {
   try {
@@ -68,7 +68,7 @@ async function run() {
     app.post("/jwt", async (req, res) => {
       try {
         const data = req.body;
-        const token = jwt.sign(data, process.env.JWT_PRYVET_KEY, {
+        const token = jwt.sign(data, process.env.ACCESS_SECRET_TOKEN, {
           expiresIn: "1d",
         });
         res
@@ -153,15 +153,18 @@ async function run() {
     });
     app.get("/carts", async (req, res) => {
       try {
+        console.log(req.cookies.token);
         const result = await cartsCoffeeCollection.find().toArray();
         res.send(result);
       } catch (error) {
         console.error(error);
+        res.status(500).send({ error: 'An error occurred while retrieving carts.' });
       }
     });
     app.post("/carts", async (req, res) => {
       try {
         const data = req.body;
+        
         const result = await cartsCoffeeCollection.insertOne(data);
         res.send(result);
       } catch (error) {
