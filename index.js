@@ -10,7 +10,9 @@ console.log(port);
 // middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "https://coffee-rush-15b08.web.app"
+    ],
     credentials: true,
   })
 );
