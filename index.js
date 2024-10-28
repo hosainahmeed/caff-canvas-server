@@ -52,11 +52,11 @@ const verifyToken = (req, res, next) => {
 
 async function run() {
   try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.connect();
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
 
     const coffeeDataCollection = client.db("coffeeDb").collection("coffee");
     const specialCoffeeCollection = client.db("coffeeDb").collection("special");
@@ -153,18 +153,21 @@ async function run() {
         console.error(error);
       }
     });
-    app.get("/carts", async (req, res) => {
+    app.get("/carts/:email", async (req, res) => {
       try {
-        console.log(req.cookies.token);
-        const result = await cartsCoffeeCollection.find().toArray();
-        res.send(result);
+        const email = req.params.email;
+        const result = await cartsCoffeeCollection.find({ userEmail: email }).toArray();
+        if (result.length > 0) {
+          res.send(result);
+        } else {
+          res.status(404).send({ message: "No carts found for this email." });
+        }
       } catch (error) {
         console.error(error);
-        res
-          .status(500)
-          .send({ error: "An error occurred while retrieving carts." });
+        res.status(500).send({ error: "An error occurred while retrieving carts." });
       }
     });
+    
     app.post("/carts", async (req, res) => {
       try {
         const data = req.body;
